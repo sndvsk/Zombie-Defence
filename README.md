@@ -1,2 +1,2 @@
 # progproject
-arcade game
+<h1>arcade game</h1>
