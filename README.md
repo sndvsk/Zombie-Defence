@@ -1,2 +1,2 @@
-# progproject
-<h1>arcade game</h1>
+# Prog Project
+<h1>Arcade Game</h1>
