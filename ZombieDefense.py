@@ -1,6 +1,6 @@
 import pygame, random, threading, time
 pygame.init()
-width = 1600    #1024
+width = 1024    #1024
 height = 900    #768
 
 screen = pygame.display.set_mode([width, height])
@@ -13,7 +13,7 @@ musicBG = pygame.mixer.music.load("musicBG.mp3")
 
 playImg = pygame.image.load("playButtonRed.png")
 playX = screen.get_width() / 2 - playImg.get_width() / 2
-playY = screen.get_height() / 2
+playY = screen.get_height() / 2 + 50
 
 font = pygame.font.SysFont("monospace", 24, bold=True, italic=False)
 scoreFont = pygame.font.SysFont("monospace", 48, bold=True, italic=False)
