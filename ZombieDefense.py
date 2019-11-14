@@ -211,9 +211,10 @@ while True:
 
             pygame.display.flip()
 
-            for e in pygame.event.get():
+            for e in pygame.event.get():  #Need to be fixed
                 if e.type == pygame.QUIT:
                     pygame.quit()
+                    break
                 elif e.type == pygame.MOUSEBUTTONDOWN:
                     if ((mouseX >= tryAgainX) and (mouseX <= (tryAgainX + tryAgainImg.get_width()))) and ((mouseY >= tryAgainY) and (mouseY <= (tryAgainY + tryAgainImg.get_height()))):
                         gunSound.play()
@@ -228,5 +229,3 @@ while True:
     if HP <= 0:
         gameOn = False
         gameState = "end"
-        
-pygame.quit()
