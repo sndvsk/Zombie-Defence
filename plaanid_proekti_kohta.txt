@@ -1,0 +1,5 @@
+Edasised plaanid:
+
+Teeme pooed, kus saab upgrade osta. Üks pood on roundite jooksul(power ups, heal etc). Teine pood roundite vahel(permanent hp increase, attack modifications etc).
+Bossid roundite lõppus.
+Samuti tahame teha veel paar lokatsiooni, kus on teised vaenlased(teised spraitid ja nende liigutused, teised backgorundit).
