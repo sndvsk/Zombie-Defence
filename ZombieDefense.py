@@ -1,9 +1,9 @@
 import pygame, random, threading, time
 pygame.init()
 width = 1024    #1024
-height = 900    #768
+height = 768    #768
 
-screen = pygame.display.set_mode([width, height])
+screen = pygame.display.set_mode([width, height], pygame.FULLSCREEN)
 
 background = pygame.image.load("backgroundZD.jpg")
 backgroundStart = pygame.image.load("backgroundStart.jpg")
