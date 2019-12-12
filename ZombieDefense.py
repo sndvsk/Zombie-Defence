@@ -121,6 +121,9 @@ class GameController:
                     gunSound.play()
                     self.state = "SELECT LEVEL"
                     # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_ESCAPE:
+                    pygame.quit()
 
     def select_level(self):
         self.bg = self.backgrounds["SELECT"]
