@@ -128,8 +128,10 @@ class GameController:
     def select_level(self):
         self.bg = self.backgrounds["SELECT"]
         screen.blit(self.bg, [0, 0])
-        screen.blit(self.levels["Desert"].icon,
-                    [screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), screen.get_height() + 400])
+        screen.blit(self.levels["Desert"].icon, [0, 0])
+
+
+        #[screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), screen.get_height() + 400])
         #screen.blit(self.levels["Football"].icon)
         #screen.blit(self.levels["Neon"].icon)
         #screen.blit(self.levels["Tartu"].icon)
