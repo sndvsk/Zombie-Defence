@@ -69,6 +69,7 @@ class Zombie:
         elif self.hp == 50:
             screen.blit(self.hp1Image, [self.zombieX, self.zombieY - 10])
 
+
 def zombieMove():
     for zombie in zombieList:
         zombie.attack()
@@ -179,6 +180,9 @@ while True:
                         gameOn = True
                         threading.Thread(target=spawnZombies).start()
 
+        #elif gameState == "CHOOSE LEVEL":
+
+
         elif gameState == "pause":
             screen.blit(gray_background, [0, 0])
 
@@ -287,3 +291,5 @@ while True:
     if HP <= 0:
         gameOn = False
         gameState = "end"
+
+pygame.quit()
