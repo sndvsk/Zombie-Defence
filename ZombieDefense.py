@@ -128,13 +128,14 @@ class GameController:
     def select_level(self):
         self.bg = self.backgrounds["SELECT"]
         screen.blit(self.bg, [0, 0])
-        screen.blit(self.levels["Desert"].icon, [0, 0])
-
-
-        #[screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), screen.get_height() + 400])
-        #screen.blit(self.levels["Football"].icon)
-        #screen.blit(self.levels["Neon"].icon)
-        #screen.blit(self.levels["Tartu"].icon)
+        desert_pos = [screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), 330]
+        neon_pos = [screen.get_width() / 2 - 70 - self.levels["Neon"].icon.get_width(), 545]
+        football_pos = [screen.get_width() / 2 + 280 - self.levels["Football"].icon.get_width(), 330]
+        tartu_pos = [screen.get_width() / 2 + 280 - self.levels["Tartu"].icon.get_width(), 545]
+        screen.blit(self.levels["Desert"].icon, desert_pos)
+        screen.blit(self.levels["Football"].icon, football_pos)
+        screen.blit(self.levels["Neon"].icon, neon_pos)
+        screen.blit(self.levels["Tartu"].icon, tartu_pos)
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
