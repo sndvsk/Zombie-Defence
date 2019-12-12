@@ -103,9 +103,9 @@ class GameController:
 
         if ((mouse_x >= self.play_x) and (mouse_x <= (self.play_x + self.play_button.get_width()))) and (
                 (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
-            play_button = pygame.image.load("playButtonBlue.png")
+            self.play_button = pygame.image.load("playButtonBlue.png")
         else:
-            play_button = pygame.image.load("playButtonRed.png")
+            self.play_button = pygame.image.load("playButtonRed.png")
 
         screen.blit(self.bg, [0, 0])
         screen.blit(self.play_button, [self.play_x, self.play_y])
@@ -117,7 +117,7 @@ class GameController:
                 pygame.quit()
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 if ((mouse_x >= self.play_x) and (mouse_x <= (self.play_x + self.play_button.get_width()))) and (
-                        (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + play_button.get_height()))):
+                        (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
                     gunSound.play()
                     self.state = "SELECT LEVEL"
                     # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round
