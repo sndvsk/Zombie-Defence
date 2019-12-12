@@ -181,8 +181,6 @@ while True:
                         threading.Thread(target=spawnZombies).start()
 
         #elif gameState == "CHOOSE LEVEL":
-
-
         elif gameState == "pause":
             screen.blit(gray_background, [0, 0])
 
