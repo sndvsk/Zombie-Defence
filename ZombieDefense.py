@@ -297,8 +297,6 @@ class GameController:
                 zombies.append(Zombie(temp_zombie_x, temp_zombie_y, zombieImg))
             time.sleep(spawnSpeed)
 
-gameOn = False
-
 pygame.mixer.music.play()
 
 ZF = GameController()
