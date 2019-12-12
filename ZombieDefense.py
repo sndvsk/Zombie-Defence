@@ -10,10 +10,11 @@ backgroundStart = pygame.image.load("backgroundStart.jpg")
 
 gray_background = pygame.image.load("img/gray_background.png")
 
-lvl_1 = pygame.image.load("lvl_desert.png")
+lvl_select_bg = pygame.image.load("img/level_select_bg.png")
+"""lvl_1 = pygame.image.load("lvl_desert.png")
 lvl_2 = pygame.image.load("lvl_football.png")
 lvl_3 = pygame.image.load("lvl_neon.png")
-lvl_4 = pygame.image.load("lvl_tartu.png)
+lvl_4 = pygame.image.load("lvl_tartu.png)"""
 
 gunSound = pygame.mixer.Sound('gunSound.wav')
 musicBG = pygame.mixer.music.load("musicBG.mp3")
@@ -186,8 +187,10 @@ while True:
                         threading.Thread(target=spawnZombies).start()
 
         elif gameState == "CHOOSE LEVEL":
-            screen.blit(gray_background, [0, 0])
+            screen.blit(lvl_select_bg, [0, 0])
 
+
+            pygame.display.flip()
 
         elif gameState == "pause":
             screen.blit(gray_background, [0, 0])
