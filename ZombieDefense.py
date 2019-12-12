@@ -106,6 +106,8 @@ while True:
                     gunSound.play()
                     bulletState = "shooting"
                     bulletY = height - turret.get_height()
+                if e.key == pygame.K_ESCAPE:
+                    pygame.quit()
         
         key = pygame.key.get_pressed()
         if key[pygame.K_RIGHT]:
