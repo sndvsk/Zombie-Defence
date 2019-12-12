@@ -1,7 +1,7 @@
 import pygame, random, threading, time
 pygame.init()
 width = 1024    #1024
-height = 768    #768
+height = 768    #768 or 900
 
 screen = pygame.display.set_mode([width, height], pygame.FULLSCREEN)
 
