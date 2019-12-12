@@ -5,12 +5,10 @@ height = 768    #768 or 900
 
 screen = pygame.display.set_mode([width, height], pygame.FULLSCREEN)
 
-background = pygame.image.load("backgroundZD.jpg")
+gray_background = pygame.image.load("img/other/gray_background.png")
 
-gray_background = pygame.image.load("img/gray_background.png")
-
-gunSound = pygame.mixer.Sound('gunSound.wav')
-musicBG = pygame.mixer.music.load("musicBG.mp3")
+gunSound = pygame.mixer.Sound('sounds/gunSound.wav')
+musicBG = pygame.mixer.music.load("sounds/musicBG.mp3")
 
 font = pygame.font.SysFont("monospace", 24, bold=True, italic=False)
 scoreFont = pygame.font.SysFont("monospace", 48, bold=True, italic=False)
@@ -20,25 +18,24 @@ GAMEOVERImg = GAMEOVERfont.render("GAME OVER", 1, (255,0,0))
 GAMEOVERX = screen.get_width() / 2 - GAMEOVERImg.get_width() / 2
 GAMEOVERY = screen.get_height() / 2 - GAMEOVERImg.get_height() / 2 - 80
 
-turret = pygame.image.load("turret.png")
+turret = pygame.image.load("img/weapons/Desert.png")
 turretHeight = turret.get_height()
-turretX = background.get_width() / 2 - turret.get_width() / 2
+turretX = width / 2 - turret.get_width() / 2
 
-wall = pygame.image.load("zombieWall.png")
+wall = pygame.image.load("img/other/zombieWall.png")
 wallX = 0
 wallY = height - turret.get_height()
 
-bullet = pygame.image.load("bullet.png")
+bullet = pygame.image.load("img/other/bullet.png")
 bulletX = turretX + turret.get_width() / 2 - bullet.get_width() / 2
 bulletY = height - turret.get_height()
 bulletState = "waiting"
 
-fire = pygame.image.load("fire.png")
+fire = pygame.image.load("img/other/fire.png")
 
 zombies = []
 spawnSpeed = 1
 zombieSpeed = 1
-zombieImg = pygame.image.load("zombie.png")
 
 
 class Zombie:
@@ -46,9 +43,9 @@ class Zombie:
         self.zombieX = zombieX
         self.zombieY = zombieY
         self.image = zombieImg
-        self.hp3Image = pygame.image.load("3hp.png")
-        self.hp2Image = pygame.image.load("2hp.png")
-        self.hp1Image = pygame.image.load("1hp.png")
+        self.hp3Image = pygame.image.load("img/hp/3hp.png")
+        self.hp2Image = pygame.image.load("img/hp/2hp.png")
+        self.hp1Image = pygame.image.load("img/hp/1hp.png")
         self.hp = 150
 
     def attack(self):
@@ -84,7 +81,7 @@ class GameController:
     levels = {"Desert": Level("Desert"), "Football": Level("Football"), "Neon": Level("Neon"), "Tartu": Level("Tartu")}
     backgrounds = {"START": pygame.image.load("img/bg/start.jpg"), "SELECT": pygame.image.load("img/bg/level_select.png")}
 
-    play_button = pygame.image.load("playButtonRed.png")
+    play_button = pygame.image.load("img/buttons/playButtonRed.png")
     play_x = screen.get_width() / 2 - play_button.get_width() / 2
     play_y = screen.get_height() / 2 + 50
 
@@ -103,9 +100,9 @@ class GameController:
 
         if ((mouse_x >= self.play_x) and (mouse_x <= (self.play_x + self.play_button.get_width()))) and (
                 (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
-            self.play_button = pygame.image.load("playButtonBlue.png")
+            self.play_button = pygame.image.load("img/buttons/playButtonBlue.png")
         else:
-            self.play_button = pygame.image.load("playButtonRed.png")
+            self.play_button = pygame.image.load("img/buttons/playButtonRed.png")
 
         screen.blit(self.bg, [0, 0])
         screen.blit(self.play_button, [self.play_x, self.play_y])
@@ -160,16 +157,38 @@ class GameController:
             if e.type == pygame.QUIT:
                 pygame.quit()
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                if ((mouse_x >= desert_pos[0]) and (mouse_x <= (desert_pos[0] + self.levels["Desert"].icon.get_width()))) and (
-                        (mouse_y >= desert_pos[1]) and (mouse_y <= (desert_pos[1] + self.levels["Desert"].icon.get_height()))):
+                if ((mouse_x >= desert_pos[0]) and (
+                        mouse_x <= (desert_pos[0] + self.levels["Desert"].icon.get_width()))) and (
+                        (mouse_y >= desert_pos[1]) and (
+                        mouse_y <= (desert_pos[1] + self.levels["Desert"].icon.get_height()))):
                     gunSound.play()
                     self.level = self.levels["Desert"]
                     self.is_started = True
                     threading.Thread(target=self.spawn_zombies).start()
-                if ((mouse_x >= desert_pos[0]) and (mouse_x <= (desert_pos[0] + self.levels["Desert"].icon.get_width()))) and (
-                        (mouse_y >= desert_pos[1]) and (mouse_y <= (desert_pos[1] + self.levels["Desert"].icon.get_height()))):
+                if ((mouse_x >= football_pos[0]) and (
+                        mouse_x <= (football_pos[0] + self.levels["Football"].icon.get_width()))) and (
+                        (mouse_y >= football_pos[1]) and (
+                        mouse_y <= (football_pos[1] + self.levels["Football"].icon.get_height()))):
                     gunSound.play()
                     self.level = self.levels["Football"]
+                    self.is_started = True
+                    threading.Thread(target=self.spawn_zombies).start()
+                if ((mouse_x >= neon_pos[0]) and (
+                        mouse_x <= (neon_pos[0] + self.levels["Neon"].icon.get_width()))) and (
+                        (mouse_y >= neon_pos[1]) and (
+                        mouse_y <= (neon_pos[1] + self.levels["Neon"].icon.get_height()))):
+                    screen.blit(overlay, neon_pos)
+                    gunSound.play()
+                    self.level = self.levels["Neon"]
+                    self.is_started = True
+                    threading.Thread(target=self.spawn_zombies).start()
+                if ((mouse_x >= tartu_pos[0]) and (
+                        mouse_x <= (tartu_pos[0] + self.levels["Tartu"].icon.get_width()))) and (
+                        (mouse_y >= tartu_pos[1]) and (
+                        mouse_y <= (tartu_pos[1] + self.levels["Tartu"].icon.get_height()))):
+                    screen.blit(overlay, tartu_pos)
+                    gunSound.play()
+                    self.level = self.levels["Tartu"]
                     self.is_started = True
                     threading.Thread(target=self.spawn_zombies).start()
             elif e.type == pygame.KEYDOWN:
@@ -181,7 +200,7 @@ class GameController:
     def pause(self):
         screen.blit(gray_background, [0, 0])
 
-        hp_label = font.render(str(HP) + "HP", 1, (255, 0, 0))
+        hp_label = font.render(str(self.level.HP) + "HP", 1, (255, 0, 0))
 
         killed_zombies_label = font.render("Killed Zombies: " + str(self.level.KILLED_ZOMBIES), 1, (255, 0, 0))
 
@@ -293,10 +312,10 @@ class GameController:
     def move_zombies(self):
         for zombie in self.zombies:
             zombie.attack()
-            if ((bulletY <= (zombie.zombieY + zombieImg.get_height())) and bulletY >= zombie.zombieY + zombieImg.get_height() - 50) and (bulletX >= zombie.zombieX and (bulletX <= zombie.zombieX + zombieImg.get_width())):
+            if ((bulletY <= (zombie.zombieY + zombie.image.get_height())) and bulletY >= zombie.zombieY + zombie.image.get_height() - 50) and (bulletX >= zombie.zombieX and (bulletX <= zombie.zombieX + zombie.image.get_width())):
                 zombie.hp -= 50
                 if zombie.hp == 0:
-                    del self.zombies[zombies.index(zombie)]
+                    del self.zombies[self.zombies.index(zombie)]
                     self.level.KILLED_ZOMBIES += 1
             if zombie.zombieY > height:
                 del self.zombies[self.zombies.index(zombie)]
@@ -305,9 +324,9 @@ class GameController:
     def spawn_zombies(self):
         while self.is_started:
             if len(self.zombies) < 7:
-                temp_zombie_x = random.randint(0, width - zombieImg.get_width())
+                temp_zombie_x = random.randint(0, width - ZF.level.zombie.get_width())
                 temp_zombie_y = 210
-                zombies.append(Zombie(temp_zombie_x, temp_zombie_y, zombieImg))
+                self.zombies.append(Zombie(temp_zombie_x, temp_zombie_y, ZF.level.zombie))
             time.sleep(spawnSpeed)
 
 
@@ -328,7 +347,7 @@ while True:
                     bulletY = height - turret.get_height()
                 if e.key == pygame.K_ESCAPE:
                     ZF.is_started = False
-                    ZF.state = "pause"
+                    ZF.state = "PAUSE"
 
         key = pygame.key.get_pressed()
         if key[pygame.K_RIGHT]:
@@ -339,17 +358,17 @@ while True:
         if bulletState == "shooting" and bulletY > 250:
             shootSpeed = 50
 
-            bulletX = turretX + turret.get_width() / 2 - bullet.get_width() / 2
+            bulletX = turretX + ZF.level.weapon.get_width() / 2 - ZF.level.bullet.get_width() / 2
             bulletY -= shootSpeed
 
         elif bulletState == "shooting" and bulletY <= 250:
             bulletState = "waiting"
 
-        screen.blit(background, [0, 0])
+        screen.blit(ZF.level.bg, [0, 0])
 
         """ SHOOTING ACTION """
         if bulletState == "shooting":
-            screen.blit(bullet, [bulletX, bulletY])
+            screen.blit(ZF.level.bullet, [bulletX, bulletY])
 
             fireX = turretX + turret.get_width() / 2 - fire.get_width() / 2
             fireY = height - turret.get_height() - fire.get_height()
@@ -364,9 +383,13 @@ while True:
         screen.blit(KILLED_ZOMBIESImg, [width - KILLED_ZOMBIESImg.get_width(), 0])
 
         screen.blit(wall, [wallX, wallY])
-        screen.blit(turret, [turretX, height-turretHeight])
+        screen.blit(ZF.level.weapon, [turretX, height-turretHeight])
 
         pygame.display.flip()
+
+        if ZF.level.HP <= 0:
+            ZF.is_started = False
+            ZF.state = "END"
 
     else:
 
@@ -381,7 +404,3 @@ while True:
 
         elif ZF.state == "END":
             ZF.end_round()
-
-    if ZF.level.HP <= 0:
-        ZF.is_started = False
-        ZF.state = "END"
