@@ -93,9 +93,11 @@ class GameController:
     def __init__(self):
         self.level = None
         self.bg = self.backgrounds["START"]
-        self.is_playing = False
+        self.is_started = False
         self.state = "START"
         self.zombies = []
+
+        self.levels["Desert"].enabled = True
 
     def start_menu(self):
         mouse_x = pygame.mouse.get_pos()[0]
@@ -120,14 +122,17 @@ class GameController:
                         (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
                     gunSound.play()
                     self.state = "SELECT LEVEL"
-                    # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_BACKSPACE:
                     pygame.quit()
 
     def select_level(self):
+        mouse_x = pygame.mouse.get_pos()[0]
+        mouse_y = pygame.mouse.get_pos()[1]
+
         self.bg = self.backgrounds["SELECT"]
         screen.blit(self.bg, [0, 0])
+
         desert_pos = [screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), 330]
         neon_pos = [screen.get_width() / 2 - 70 - self.levels["Neon"].icon.get_width(), 545]
         football_pos = [screen.get_width() / 2 + 280 - self.levels["Football"].icon.get_width(), 330]
@@ -141,11 +146,17 @@ class GameController:
             if e.type == pygame.QUIT:
                 pygame.quit()
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                """if ((mouse_x >= self.play_x) and (mouse_x <= (self.play_x + self.play_button.get_width()))) and (
-                        (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
+                if ((mouse_x >= desert_pos[0]) and (mouse_x <= (desert_pos[0] + self.levels["Desert"].icon.get_width()))) and (
+                        (mouse_y >= desert_pos[1]) and (mouse_y <= (desert_pos[1] + self.levels["Desert"].icon.get_height()))):
                     gunSound.play()
-                    self.state = "SELECT LEVEL"
-                    # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round"""
+                    self.level = self.levels["Desert"]
+                    self.is_started = True
+                    threading.Thread(target=self.spawn_zombies).start()
+                if ((mouse_x >= desert_pos[0]) and (mouse_x <= (desert_pos[0] + self.levels["Desert"].icon.get_width()))) and (
+                        (mouse_y >= desert_pos[1]) and (mouse_y <= (desert_pos[1] + self.levels["Desert"].icon.get_height()))):
+                    gunSound.play()
+                    self.level = self.levels["Football"]
+                    self.is_started = True
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_BACKSPACE:
                     pygame.quit()
@@ -196,12 +207,12 @@ class GameController:
                 pygame.quit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_ESCAPE:
-                    self.is_playing = True
+                    self.is_started = True
                     self.state = "play"
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 if ((mouseX >= resumeX) and (mouseX <= (resumeX + resume_button.get_width()))) and (
                         (mouseY >= resumeY) and (mouseY <= (resumeY + resume_button.get_height()))):
-                    self.is_playing = True
+                    self.is_started = True
                     self.state = "play"
                 if ((mouseX >= quitX) and (mouseX <= (quitX + quit_button.get_width()))) and (
                         (mouseY >= quitY) and (mouseY <= (quitY + quit_button.get_height()))):
@@ -294,7 +305,7 @@ ZF = GameController()
 
 while True:
 
-    if gameOn:
+    if ZF.is_started:
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
