@@ -69,12 +69,12 @@ class Level:
 
     def __init__(self, location):
         self.location = location
-        self.bg = pygame.image.load(f"img/bg/{location}.png")
-        self.icon = pygame.image.load(f"img/icons/{location}.png")
+        self.bg = pygame.image.load("img/bg/"+location+".png")
+        self.icon = pygame.image.load("img/icons/"+location+".png")
 
-        self.zombie = pygame.image.load(f"img/zombies/{location}.png")
-        self.weapon = pygame.image.load(f"img/weapons/{location}.png")
-        self.bullet = pygame.image.load(f"img/bullets/{location}.png")
+        self.zombie = pygame.image.load("img/zombies/"+location+".png")
+        self.weapon = pygame.image.load("img/weapons/"+location+".png")
+        self.bullet = pygame.image.load("img/bullets/"+location+".png")
 
         self.record = 0
         self.KILLED_ZOMBIES = 0
@@ -122,17 +122,30 @@ class GameController:
                     self.state = "SELECT LEVEL"
                     # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round
             elif e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_ESCAPE:
+                if e.key == pygame.K_BACKSPACE:
                     pygame.quit()
 
     def select_level(self):
         self.bg = self.backgrounds["SELECT"]
         screen.blit(self.bg, [0, 0])
         screen.blit(self.levels["Desert"].icon,
-                    [screen.get_width() / 2 + 70 + self.levels["Desert"].icon.get_width(), screen.get_height() + 400])
+                    [screen.get_width() / 2 - 70 - self.levels["Desert"].icon.get_width(), screen.get_height() + 400])
         #screen.blit(self.levels["Football"].icon)
         #screen.blit(self.levels["Neon"].icon)
         #screen.blit(self.levels["Tartu"].icon)
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                """if ((mouse_x >= self.play_x) and (mouse_x <= (self.play_x + self.play_button.get_width()))) and (
+                        (mouse_y >= self.play_y) and (mouse_y <= (self.play_y + self.play_button.get_height()))):
+                    gunSound.play()
+                    self.state = "SELECT LEVEL"
+                    # threading.Thread(target=self.spawn_zombies).start()  TODO: Move to play_round"""
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_BACKSPACE:
+                    pygame.quit()
 
         pygame.display.flip()
 
