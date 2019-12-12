@@ -8,6 +8,8 @@ screen = pygame.display.set_mode([width, height], pygame.FULLSCREEN)
 background = pygame.image.load("backgroundZD.jpg")
 backgroundStart = pygame.image.load("backgroundStart.jpg")
 
+gray_background = pygame.image.load("img/gray_background.png")
+
 gunSound = pygame.mixer.Sound('gunSound.wav')
 musicBG = pygame.mixer.music.load("musicBG.mp3")
 
@@ -46,6 +48,7 @@ spawnSpeed = 1
 zombieSpeed = 1
 zombieImg = pygame.image.load("zombie.png")
 
+
 class Zombie:
     def __init__(self, zombieX, zombieY, zombieImg):
         self.zombieX = zombieX
@@ -67,7 +70,7 @@ class Zombie:
             screen.blit(self.hp1Image, [self.zombieX, self.zombieY - 10])
 
 def zombieMove():
-    for zombie in (zombieList):
+    for zombie in zombieList:
         zombie.attack()
         if ((bulletY <= (zombie.zombieY + zombieImg.get_height())) and bulletY >= zombie.zombieY + zombieImg.get_height() - 50) and (bulletX >= zombie.zombieX and (bulletX <= zombie.zombieX + zombieImg.get_width())):
             zombie.hp -= 50
@@ -79,6 +82,7 @@ def zombieMove():
             del zombieList[zombieList.index(zombie)]
             global HP
             HP -= 10
+
 
 def spawnZombies():
     while gameOn == True:
@@ -96,7 +100,7 @@ pygame.mixer.music.play()
 
 while True:
 
-    if gameOn == True:
+    if gameOn:
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -107,7 +111,8 @@ while True:
                     bulletState = "shooting"
                     bulletY = height - turret.get_height()
                 if e.key == pygame.K_ESCAPE:
-                    pygame.quit()
+                    gameOn = False
+                    gameState = "pause"
         
         key = pygame.key.get_pressed()
         if key[pygame.K_RIGHT]:
@@ -127,7 +132,7 @@ while True:
 
         screen.blit(background, [0, 0])
         
-        #Shooting action
+        """ SHOOTING ACTION """
         if bulletState == "shooting":
             screen.blit(bullet, [bulletX, bulletY])
             
@@ -140,13 +145,12 @@ while True:
         HPImg = font.render(str(HP) + "HP", 1, (255,0,0))
         screen.blit(HPImg, [0, 0])
         
-        KILLED_ZOMBIESImg = font.render("Killed Zombies: " + str(KILLED_ZOMBIES), 1, (255,0,0))
+        KILLED_ZOMBIESImg = font.render("Killed Zombies: " + str(KILLED_ZOMBIES), 1, (255, 0, 0))
         screen.blit(KILLED_ZOMBIESImg, [width - KILLED_ZOMBIESImg.get_width(), 0])
 
         screen.blit(wall, [wallX, wallY])        
         screen.blit(turret, [turretX, height-turretHeight])
 
-        
         pygame.display.flip()
 
     else:
@@ -175,19 +179,72 @@ while True:
                         gameOn = True
                         threading.Thread(target=spawnZombies).start()
 
+        elif gameState == "pause":
+            screen.blit(gray_background, [0, 0])
+
+            HPImg = font.render(str(HP) + "HP", 1, (255, 0, 0))
+
+            KILLED_ZOMBIESImg = font.render("Killed Zombies: " + str(KILLED_ZOMBIES), 1, (255, 0, 0))
+
+            scoreImg = scoreFont.render("Your score: " + str(KILLED_ZOMBIES), 1, (255, 0, 0))
+            scoreX = screen.get_width() / 2 - scoreImg.get_width() / 2
+            scoreY = GAMEOVERY + GAMEOVERImg.get_height()
+
+            resume_img = scoreFont.render("RESUME", 1, (255, 0, 0))
+            resumeX = screen.get_width() / 2 - resume_img.get_width() / 2
+            resumeY = scoreY + scoreImg.get_height() + 10
+
+            quitImg = scoreFont.render("QUIT", 1, (255, 0, 0))
+            quitX = screen.get_width() / 2 - quitImg.get_width() / 2
+            quitY = resumeY + resume_img.get_height() + 10
+
+            mouseX = pygame.mouse.get_pos()[0]
+            mouseY = pygame.mouse.get_pos()[1]
+
+            if ((mouseX >= resumeX) and (mouseX <= (resumeX + resume_img.get_width()))) and ((mouseY >= resumeY) and (mouseY <= (resumeY + resume_img.get_height()))):
+                resume_img = scoreFont.render("RESUME", 1, (0, 0, 255))
+            else:
+                tryAgainImg = scoreFont.render("RESUME", 1, (255, 0, 0))
+            if ((mouseX >= quitX) and (mouseX <= (quitX + quitImg.get_width()))) and ((mouseY >= quitY) and (mouseY <= (quitY + quitImg.get_height()))):
+                quitImg = scoreFont.render("QUIT", 1, (0, 0, 255))
+            else:
+                quitImg = scoreFont.render("QUIT", 1, (255, 0, 0))
+
+            screen.blit(HPImg, [0, 0])
+            screen.blit(KILLED_ZOMBIESImg, [width - KILLED_ZOMBIESImg.get_width(), 0])
+            screen.blit(scoreImg, [scoreX, scoreY])
+            screen.blit(resume_img, [resumeX, resumeY])
+            screen.blit(quitImg, [quitX, quitY])
+
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    pygame.quit()
+                elif e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_ESCAPE:
+                        gameOn = True
+                        gameState = "play"
+                elif e.type == pygame.MOUSEBUTTONDOWN:
+                    if ((mouseX >= resumeX) and (mouseX <= (resumeX + resume_img.get_width()))) and ((mouseY >= resumeY) and (mouseY <= (resumeY + resume_img.get_height()))):
+                        gameOn = True
+                        gameState = "play"
+                    if ((mouseX >= quitX) and (mouseX <= (quitX + quitImg.get_width()))) and ((mouseY >= quitY) and (mouseY <= (quitY + quitImg.get_height()))):
+                        pygame.quit()
+
+            pygame.display.flip()
+
         elif gameState == "end":
         
             zombieList = []
             
-            scoreImg = scoreFont.render("Your score: " + str(KILLED_ZOMBIES), 1, (255,0,0))
+            scoreImg = scoreFont.render("Your score: " + str(KILLED_ZOMBIES), 1, (255, 0, 0))
             scoreX = screen.get_width() / 2 - scoreImg.get_width() / 2
-            scoreY = GAMEOVERY  + GAMEOVERImg.get_height()
+            scoreY = GAMEOVERY + GAMEOVERImg.get_height()
 
-            tryAgainImg = scoreFont.render("TRY AGAIN", 1, (255,0,0))
+            tryAgainImg = scoreFont.render("TRY AGAIN", 1, (255, 0, 0))
             tryAgainX = screen.get_width() / 2 - tryAgainImg.get_width() / 2
             tryAgainY = scoreY + scoreImg.get_height() + 10
 
-            quitImg = scoreFont.render("QUIT", 1, (255,0,0))
+            quitImg = scoreFont.render("QUIT", 1, (255, 0, 0))
             quitX = screen.get_width() / 2 - quitImg.get_width() / 2
             quitY = tryAgainY + tryAgainImg.get_height() / 2 + 30
 
@@ -199,14 +256,14 @@ while True:
             mouseY = pygame.mouse.get_pos()[1]
 
             if ((mouseX >= tryAgainX) and (mouseX <= (tryAgainX + tryAgainImg.get_width()))) and ((mouseY >= tryAgainY) and (mouseY <= (tryAgainY + tryAgainImg.get_height()))):
-                tryAgainImg = scoreFont.render("TRY AGAIN", 1, (0,0,255))
+                tryAgainImg = scoreFont.render("TRY AGAIN", 1, (0, 0, 255))
             else:
-                tryAgainImg = scoreFont.render("TRY AGAIN", 1, (255,0,0))
+                tryAgainImg = scoreFont.render("TRY AGAIN", 1, (255, 0, 0))
 
             if ((mouseX >= quitX) and (mouseX <= (quitX + quitImg.get_width()))) and ((mouseY >= quitY) and (mouseY <= (quitY + quitImg.get_height()))):
-                quitImg = scoreFont.render("QUIT", 1, (0,0,255))
+                quitImg = scoreFont.render("QUIT", 1, (0, 0, 255))
             else:
-                quitImg = scoreFont.render("QUIT", 1, (255,0,0))
+                quitImg = scoreFont.render("QUIT", 1, (255, 0, 0))
 
             screen.blit(quitImg, [quitX, quitY])
             screen.blit(tryAgainImg, [tryAgainX, tryAgainY])
@@ -230,5 +287,3 @@ while True:
     if HP <= 0:
         gameOn = False
         gameState = "end"
-        
-pygame.quit()
