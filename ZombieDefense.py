@@ -374,5 +374,3 @@ while True:
         gameState = "end"
 
 pygame.quit()
-
-a
