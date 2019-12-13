@@ -5,7 +5,7 @@ height = 768    #768 or 900
 
 screen = pygame.display.set_mode([width, height], pygame.FULLSCREEN)
 
-gray_background = pygame.image.load("img/other/gray_background.png")
+gray_overlay = pygame.image.load("img/other/gray_overlay.png")
 
 gunSound = pygame.mixer.Sound('sounds/gunSound.wav')
 musicBG = pygame.mixer.music.load("sounds/musicBG.mp3")
@@ -18,16 +18,6 @@ GAMEOVERImg = GAMEOVERfont.render("GAME OVER", 1, (255,0,0))
 GAMEOVERX = screen.get_width() / 2 - GAMEOVERImg.get_width() / 2
 GAMEOVERY = screen.get_height() / 2 - GAMEOVERImg.get_height() / 2 - 80
 
-turret = pygame.image.load("img/weapons/Desert.png")
-turretHeight = turret.get_height()
-turretX = width / 2 - turret.get_width() / 2
-
-wallX = 0
-wallY = height - turret.get_height()
-
-bullet = pygame.image.load("img/other/bullet.png")
-bulletX = turretX + turret.get_width() / 2 - bullet.get_width() / 2
-bulletY = height - turret.get_height()
 bulletState = "waiting"
 
 fire = pygame.image.load("img/other/fire.png")
@@ -38,24 +28,24 @@ zombieSpeed = 1
 
 
 class Zombie:
-    def __init__(self, zombieX, zombieY, zombieImg):
-        self.zombieX = zombieX
-        self.zombieY = zombieY
-        self.image = zombieImg
+    def __init__(self, zombie_x, zombie_y, zombie_img):
+        self.zombie_x = zombie_x
+        self.zombie_y = zombie_y
+        self.image = zombie_img
         self.hp3Image = pygame.image.load("img/hp/3hp.png")
         self.hp2Image = pygame.image.load("img/hp/2hp.png")
         self.hp1Image = pygame.image.load("img/hp/1hp.png")
         self.hp = 150
 
     def attack(self):
-        self.zombieY += zombieSpeed
-        screen.blit(self.image, [self.zombieX, self.zombieY])
+        self.zombie_y += zombieSpeed
+        screen.blit(self.image, [self.zombie_x, self.zombie_y])
         if self.hp == 150:
-            screen.blit(self.hp3Image, [self.zombieX, self.zombieY - 10])
+            screen.blit(self.hp3Image, [self.zombie_x, self.zombie_y - 10])
         elif self.hp == 100:
-            screen.blit(self.hp2Image, [self.zombieX, self.zombieY - 10])
+            screen.blit(self.hp2Image, [self.zombie_x, self.zombie_y - 10])
         elif self.hp == 50:
-            screen.blit(self.hp1Image, [self.zombieX, self.zombieY - 10])
+            screen.blit(self.hp1Image, [self.zombie_x, self.zombie_y - 10])
 
 
 class Level:
@@ -67,8 +57,15 @@ class Level:
 
         self.zombie = pygame.image.load("img/zombies/"+location+".png")
         self.weapon = pygame.image.load("img/weapons/"+location+".png")
+        self.weapon_x = width / 2 - self.weapon.get_width() / 2
+
         self.bullet = pygame.image.load("img/bullets/"+location+".png")
+        self.bullet_x = self.weapon_x + self.weapon.get_width() / 2 - self.bullet.get_width() / 2
+        self.bullet_y = height - self.weapon.get_height()
+
         self.wall = pygame.image.load("img/walls/"+location+".png")
+        self.wall_x = 0
+        self.wall_y = height - self.weapon.get_height()
 
         self.HP = 100
         self.record = 0
@@ -198,7 +195,7 @@ class GameController:
         pygame.display.flip()
 
     def pause(self):
-        screen.blit(gray_background, [0, 0])
+        screen.blit(gray_overlay, [0, 0])
 
         hp_label = font.render(str(self.level.HP) + "HP", 1, (255, 0, 0))
 
@@ -312,12 +309,15 @@ class GameController:
     def move_zombies(self):
         for zombie in self.zombies:
             zombie.attack()
-            if ((bulletY <= (zombie.zombieY + zombie.image.get_height())) and bulletY >= zombie.zombieY + zombie.image.get_height() - 50) and (bulletX >= zombie.zombieX and (bulletX <= zombie.zombieX + zombie.image.get_width())):
+            if ((self.level.bullet_y <= (zombie.zombie_y + zombie.image.get_height())) and
+                self.level.bullet_y >= zombie.zombie_y + zombie.image.get_height() - 50) and \
+                    (self.level.bullet_x >= zombie.zombie_x and
+                     (self.level.bullet_x <= zombie.zombie_x + zombie.image.get_width())):
                 zombie.hp -= 50
                 if zombie.hp == 0:
-                    del self.zombies[self.zombies.index(zombie)]
+                    del self.zombies[self.zombies.index(zombie)]   # TODO: Change del
                     self.level.KILLED_ZOMBIES += 1
-            if zombie.zombieY > height:
+            if zombie.zombie_y > height:
                 del self.zombies[self.zombies.index(zombie)]
                 self.level.HP -= 10
 
@@ -344,35 +344,35 @@ while True:
                 if e.key == pygame.K_SPACE:
                     gunSound.play()
                     bulletState = "shooting"
-                    bulletY = height - turret.get_height()
+                    ZF.level.bullet_y = height - ZF.level.weapon.get_height()
                 if e.key == pygame.K_ESCAPE:
                     ZF.is_started = False
                     ZF.state = "PAUSE"
 
         key = pygame.key.get_pressed()
         if key[pygame.K_RIGHT]:
-            turretX += 7
+            ZF.level.weapon_x += 7
         if key[pygame.K_LEFT]:
-            turretX -= 7
+            ZF.level.weapon_x -= 7
 
-        if bulletState == "shooting" and bulletY > 250:
+        if bulletState == "shooting" and ZF.level.bullet_y > 250:
             shootSpeed = 50
 
-            bulletX = turretX + ZF.level.weapon.get_width() / 2 - ZF.level.bullet.get_width() / 2
-            bulletY -= shootSpeed
+            ZF.level.bullet_x = ZF.level.weapon_x + ZF.level.weapon.get_width() / 2 - ZF.level.bullet.get_width() / 2
+            ZF.level.bullet_y -= shootSpeed
 
-        elif bulletState == "shooting" and bulletY <= 250:
+        elif bulletState == "shooting" and ZF.level.bullet_y <= 250:
             bulletState = "waiting"
 
         screen.blit(ZF.level.bg, [0, 0])
 
         """ SHOOTING ACTION """
         if bulletState == "shooting":
-            screen.blit(ZF.level.bullet, [bulletX, bulletY])
+            screen.blit(ZF.level.bullet, [ZF.level.bullet_x, ZF.level.bullet_y])
 
-            fireX = turretX + turret.get_width() / 2 - fire.get_width() / 2
-            fireY = height - turret.get_height() - fire.get_height()
-            screen.blit(fire, [fireX, fireY])
+            fire_x = ZF.level.weapon_x + ZF.level.weapon.get_width() / 2 - fire.get_width() / 2
+            fire_y = height - ZF.level.weapon.get_height() - fire.get_height()
+            screen.blit(fire, [fire_x, fire_y])
 
         ZF.move_zombies()
 
@@ -382,8 +382,8 @@ while True:
         KILLED_ZOMBIESImg = font.render("Killed Zombies: " + str(ZF.level.KILLED_ZOMBIES), 1, (255, 0, 0))
         screen.blit(KILLED_ZOMBIESImg, [width - KILLED_ZOMBIESImg.get_width(), 0])
 
-        screen.blit(ZF.level.wall, [wallX, wallY])
-        screen.blit(ZF.level.weapon, [turretX, height-turretHeight])
+        screen.blit(ZF.level.wall, [ZF.level.wall_x, ZF.level.wall_y])
+        screen.blit(ZF.level.weapon, [ZF.level.weapon_x, height-ZF.level.weapon.get_height()])
 
         pygame.display.flip()
 
