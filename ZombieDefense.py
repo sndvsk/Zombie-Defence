@@ -69,6 +69,7 @@ class Level:
         self.zombie = pygame.image.load("img/zombies/"+location+".png")
         self.weapon = pygame.image.load("img/weapons/"+location+".png")
         self.bullet = pygame.image.load("img/bullets/"+location+".png")
+        self.wall = pygame.image.load("img/walls/"+location+".png")
 
         self.HP = 100
         self.record = 0
