@@ -22,7 +22,6 @@ turret = pygame.image.load("img/weapons/Desert.png")
 turretHeight = turret.get_height()
 turretX = width / 2 - turret.get_width() / 2
 
-wall = pygame.image.load("img/other/zombieWall.png")
 wallX = 0
 wallY = height - turret.get_height()
 
@@ -383,7 +382,7 @@ while True:
         KILLED_ZOMBIESImg = font.render("Killed Zombies: " + str(ZF.level.KILLED_ZOMBIES), 1, (255, 0, 0))
         screen.blit(KILLED_ZOMBIESImg, [width - KILLED_ZOMBIESImg.get_width(), 0])
 
-        screen.blit(wall, [wallX, wallY])
+        screen.blit(ZF.level.wall, [wallX, wallY])
         screen.blit(ZF.level.weapon, [turretX, height-turretHeight])
 
         pygame.display.flip()
