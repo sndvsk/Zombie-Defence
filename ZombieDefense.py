@@ -18,16 +18,14 @@ GAMEOVERImg = GAMEOVERfont.render("GAME OVER", 1, (255,0,0))
 GAMEOVERX = screen.get_width() / 2 - GAMEOVERImg.get_width() / 2
 GAMEOVERY = screen.get_height() / 2 - GAMEOVERImg.get_height() / 2 - 80
 
-bulletState = "waiting"
-
 fire = pygame.image.load("img/other/fire.png")
 
-zombies = []
 spawnSpeed = 1
 zombieSpeed = 1
 
 
 class Zombie:
+
     def __init__(self, zombie_x, zombie_y, zombie_img):
         self.zombie_x = zombie_x
         self.zombie_y = zombie_y
@@ -48,6 +46,20 @@ class Zombie:
             screen.blit(self.hp1Image, [self.zombie_x, self.zombie_y - 10])
 
 
+class Bullet:
+
+    def __init__(self, location, level, x_neon=0, y_neon=0):
+        self.level = level
+        self.image = pygame.image.load("img/bullets/"+location+".png")
+        self.x = level.weapon_x + level.weapon.get_width() / 2 - self.image.get_width() / 2
+        self.y = height - level.weapon.get_height()
+
+        self.x_neon = x_neon
+        self.y_neon = y_neon
+
+        self.speed = 50
+
+
 class Level:
 
     def __init__(self, location):
@@ -58,10 +70,6 @@ class Level:
         self.zombie = pygame.image.load("img/zombies/"+location+".png")
         self.weapon = pygame.image.load("img/weapons/"+location+".png")
         self.weapon_x = width / 2 - self.weapon.get_width() / 2
-
-        self.bullet = pygame.image.load("img/bullets/"+location+".png")
-        self.bullet_x = self.weapon_x + self.weapon.get_width() / 2 - self.bullet.get_width() / 2
-        self.bullet_y = height - self.weapon.get_height()
 
         self.wall = pygame.image.load("img/walls/"+location+".png")
         self.wall_x = 0
@@ -87,7 +95,9 @@ class GameController:
         self.bg = self.backgrounds["START"]
         self.is_started = False
         self.state = "START"
+
         self.zombies = []
+        self.bullets = []
 
         self.levels["Desert"].enabled = True
 
@@ -297,8 +307,9 @@ class GameController:
                 if ((mouseX >= tryAgainX) and (mouseX <= (tryAgainX + tryAgainImg.get_width()))) and (
                         (mouseY >= tryAgainY) and (mouseY <= (tryAgainY + tryAgainImg.get_height()))):
                     gunSound.play()
+                    self.state = "PLAY"
                     self.is_started = True
-                    self.HP = 100
+                    self.level.HP = 100
                     self.level.KILLED_ZOMBIES = 0
                     threading.Thread(target=self.spawn_zombies).start()
                 if ((mouseX >= quitX) and (mouseX <= (quitX + quitImg.get_width()))) and (
@@ -309,25 +320,66 @@ class GameController:
     def move_zombies(self):
         for zombie in self.zombies:
             zombie.attack()
-            if ((self.level.bullet_y <= (zombie.zombie_y + zombie.image.get_height())) and
-                self.level.bullet_y >= zombie.zombie_y + zombie.image.get_height() - 50) and \
-                    (self.level.bullet_x >= zombie.zombie_x and
-                     (self.level.bullet_x <= zombie.zombie_x + zombie.image.get_width())):
-                zombie.hp -= 50
-                if zombie.hp == 0:
-                    del self.zombies[self.zombies.index(zombie)]   # TODO: Change del
-                    self.level.KILLED_ZOMBIES += 1
-            if zombie.zombie_y > height:
-                del self.zombies[self.zombies.index(zombie)]
-                self.level.HP -= 10
+            if self.level.location == "Neon":
+                for double in self.bullets:
+                    for bullet in double:
+                        if ((bullet.y_neon <= (zombie.zombie_y + zombie.image.get_height())) and
+                            bullet.y_neon >= zombie.zombie_y) and \
+                                (bullet.x_neon >= zombie.zombie_x and
+                                 (bullet.x_neon <= zombie.zombie_x + zombie.image.get_width())):
+                            zombie.hp -= 50
+                            #self.bullets.remove(bullet)
+                            if zombie.hp == 0:
+                                del self.zombies[self.zombies.index(zombie)]
+                                self.level.KILLED_ZOMBIES += 1
+            else:
+                for bullet in self.bullets:
+                    if ((bullet.y <= (zombie.zombie_y + zombie.image.get_height())) and
+                        bullet.y >= zombie.zombie_y + zombie.image.get_height() - 50) and \
+                            (bullet.x >= zombie.zombie_x and
+                             (bullet.x <= zombie.zombie_x + zombie.image.get_width())):
+                        zombie.hp -= 50
+                        self.bullets.remove(bullet)
+                        if zombie.hp == 0:
+                            del self.zombies[self.zombies.index(zombie)]
+                            self.level.KILLED_ZOMBIES += 1
+                if zombie.zombie_y > height:
+                    del self.zombies[self.zombies.index(zombie)]
+                    self.level.HP -= 10
 
     def spawn_zombies(self):
         while self.is_started:
+            if self.level.location == "Neon":
+                if len(self.zombies) < 12:
+                    temp_zombie_x = random.randint(0, width - ZF.level.zombie.get_width())
+                    temp_zombie_y = 210
+                    self.zombies.append(Zombie(temp_zombie_x, temp_zombie_y, ZF.level.zombie))
+                time.sleep(spawnSpeed)
             if len(self.zombies) < 7:
                 temp_zombie_x = random.randint(0, width - ZF.level.zombie.get_width())
                 temp_zombie_y = 210
                 self.zombies.append(Zombie(temp_zombie_x, temp_zombie_y, ZF.level.zombie))
             time.sleep(spawnSpeed)
+
+    def shoot_bullet(self):
+        if self.level.location == "Neon":
+            x1_neon = self.level.weapon_x + 140
+            x2_neon = self.level.weapon_x + self.level.weapon.get_width() - 140
+            y_neon = height - self.level.weapon.get_height()
+
+            self.bullets.append([Bullet(self.level.location, self.level, x1_neon, y_neon), Bullet(self.level.location, self.level, x2_neon, y_neon)])
+
+            """fire_x1 = self.level.weapon_x + 80
+            fire_x2 = self.level.weapon_x + self.level.weapon.get_width() - 80
+            fire_y = height - self.level.weapon.get_height() - fire.get_height()
+            screen.blit(fire, [fire_x1, fire_y])
+            screen.blit(fire, [fire_x2, fire_y])"""
+        else:
+            self.bullets.append(Bullet(ZF.level.location, ZF.level))
+
+            fire_x = ZF.level.weapon_x + ZF.level.weapon.get_width() / 2 - fire.get_width() / 2
+            fire_y = height - ZF.level.weapon.get_height() - fire.get_height()
+            screen.blit(fire, [fire_x, fire_y])
 
 
 pygame.mixer.music.play()
@@ -343,8 +395,7 @@ while True:
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_SPACE:
                     gunSound.play()
-                    bulletState = "shooting"
-                    ZF.level.bullet_y = height - ZF.level.weapon.get_height()
+                    ZF.shoot_bullet()
                 if e.key == pygame.K_ESCAPE:
                     ZF.is_started = False
                     ZF.state = "PAUSE"
@@ -355,24 +406,27 @@ while True:
         if key[pygame.K_LEFT]:
             ZF.level.weapon_x -= 7
 
-        if bulletState == "shooting" and ZF.level.bullet_y > 250:
-            shootSpeed = 50
-
-            ZF.level.bullet_x = ZF.level.weapon_x + ZF.level.weapon.get_width() / 2 - ZF.level.bullet.get_width() / 2
-            ZF.level.bullet_y -= shootSpeed
-
-        elif bulletState == "shooting" and ZF.level.bullet_y <= 250:
-            bulletState = "waiting"
-
         screen.blit(ZF.level.bg, [0, 0])
 
-        """ SHOOTING ACTION """
-        if bulletState == "shooting":
-            screen.blit(ZF.level.bullet, [ZF.level.bullet_x, ZF.level.bullet_y])
-
-            fire_x = ZF.level.weapon_x + ZF.level.weapon.get_width() / 2 - fire.get_width() / 2
-            fire_y = height - ZF.level.weapon.get_height() - fire.get_height()
-            screen.blit(fire, [fire_x, fire_y])
+        if ZF.level.location == "Neon":
+            for double in ZF.bullets:
+                if double[0].y_neon > 250:
+                    double[0].y_neon -= double[0].speed
+                    double[0].x_neon += double[0].speed
+                    screen.blit(double[0].image, [double[0].x_neon, double[0].y_neon])
+                if double[1].y_neon > 250:
+                    double[1].y_neon -= double[1].speed
+                    double[1].x_neon -= double[1].speed
+                    screen.blit(double[1].image, [double[1].x_neon, double[1].y_neon])
+                if double[0].y_neon <= 250 and double[1].y_neon <= 250:
+                    ZF.bullets.remove(double)
+        else:
+            for bullet in ZF.bullets:
+                if bullet.y > 250:
+                    bullet.y -= bullet.speed
+                    screen.blit(bullet.image, [bullet.x, bullet.y])
+                else:
+                    ZF.bullets.remove(bullet)
 
         ZF.move_zombies()
 
