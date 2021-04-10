@@ -1,3 +1,3 @@
 # Prog Project
 <h1>Arcade Game</h1>
-<p> bruh</p>
+<p>This is game that we made for our Python programming subject in University.</p>
